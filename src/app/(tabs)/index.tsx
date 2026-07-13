@@ -45,7 +45,7 @@ export default function DashboardScreen() {
       <ThemedText type="title">Dashboard</ThemedText>
       <ThemedText themeColor="textSecondary">
         {config.role === 'sender'
-          ? 'Your data syncs to the configured server when this phone is online.'
+          ? 'Your call logs and SMS sync to Google Drive when this phone is online.'
           : 'Synced data from your configured sender device appears here.'}
       </ThemedText>
 

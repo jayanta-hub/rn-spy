@@ -69,6 +69,11 @@ export default function SettingsScreen() {
         <ThemedText type="small" themeColor="textSecondary">
           Server status: {serverStatus}
         </ThemedText>
+        {config.role === 'sender' ? (
+          <ThemedText type="small" themeColor="textSecondary">
+            The sync server securely forwards call logs and SMS to its configured Google Drive folder.
+          </ThemedText>
+        ) : null}
       </ThemedView>
 
       <ThemedView type="backgroundElement" style={styles.section}>

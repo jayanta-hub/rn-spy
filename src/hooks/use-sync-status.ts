@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState } from 'react-native';
+import * as Network from 'expo-network';
 
 import { useAppConfig } from '@/context/app-config-context';
 import { isOnline, runReceiverSync, runSenderSync } from '@/services/sync-engine';
@@ -11,16 +12,19 @@ export function useSyncStatus() {
   const [status, setStatus] = useState<SyncStatus>('idle');
   const [received, setReceived] = useState<SyncPayload | null>(null);
   const [online, setOnline] = useState(true);
+  const isSyncingRef = useRef(false);
 
   const refreshOnline = useCallback(async () => {
     setOnline(await isOnline());
   }, []);
 
   const syncNow = useCallback(async () => {
+    if (isSyncingRef.current) return;
+    isSyncingRef.current = true;
     setStatus('syncing');
-    await refreshOnline();
 
     try {
+      await refreshOnline();
       if (config.role === 'sender') {
         const result = await runSenderSync(config);
         setStatus(result);
@@ -37,6 +41,8 @@ export function useSyncStatus() {
       }
     } catch {
       setStatus('error');
+    } finally {
+      isSyncingRef.current = false;
     }
   }, [config, refreshOnline, updateConfig]);
 
@@ -57,6 +63,23 @@ export function useSyncStatus() {
     });
 
     void syncNow();
+    return () => subscription.remove();
+  }, [config.autoSync, config.onboarded, syncNow]);
+
+  useEffect(() => {
+    if (!config.autoSync || !config.onboarded) return;
+
+    const subscription = Network.addNetworkStateListener((networkState) => {
+      const connected = Boolean(
+        networkState.isConnected && networkState.isInternetReachable !== false,
+      );
+      setOnline(connected);
+
+      if (connected) {
+        void syncNow();
+      }
+    });
+
     return () => subscription.remove();
   }, [config.autoSync, config.onboarded, syncNow]);
 
