@@ -70,11 +70,11 @@ The **Call History** screen includes a visible, user-started microphone recorder
 
 1. In Google Cloud, enable the Google Drive API and create a service account.
 2. Create the target Drive folder and share it with the service account's email address as an editor.
-3. Copy `.env.example` to `.env`, replace its values with the service-account email, private key, and target folder ID, then load those variables in the process that starts the server.
+3. Copy `.env.example` to `.env` and replace its values with the service-account email and private key. You can also set a default target folder ID there.
 4. Start the server with the configured environment, for example:
 
    ```bash
    set -a; source .env; set +a; npm run server
    ```
 
-Each successful sync creates a timestamped `call-sms-*.json` file in the configured folder. If the device is offline or Drive is unavailable, the app retains the payload in its queue and retries after connectivity returns.
+In the sender app, open **Settings**, enter the Google Drive folder ID, and save. Leave it empty to use the server default. Share the selected folder with the service-account email. Each successful sync creates a timestamped `call-sms-*.json` file in that folder. If the device is offline or Drive is unavailable, the app retains the payload in its queue and retries after connectivity returns.

@@ -11,10 +11,12 @@ function base64Url(value) {
   return Buffer.from(value).toString('base64url');
 }
 
-function googleDriveConfig() {
+function googleDriveConfig(requestedFolderId) {
   const privateKey = process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY?.replace(/\\n/g, '\n');
   const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
-  const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
+  const folderId =
+    (typeof requestedFolderId === 'string' && requestedFolderId.trim()) ||
+    process.env.GOOGLE_DRIVE_FOLDER_ID;
 
   return privateKey && email && folderId ? { privateKey, email, folderId } : null;
 }
@@ -53,7 +55,7 @@ async function getGoogleAccessToken({ email, privateKey }) {
 }
 
 async function uploadToGoogleDrive(payload) {
-  const config = googleDriveConfig();
+  const config = googleDriveConfig(payload.driveFolderId);
   if (!config) {
     throw new Error('Google Drive is not configured on the sync server');
   }

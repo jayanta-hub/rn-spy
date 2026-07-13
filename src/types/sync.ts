@@ -22,6 +22,7 @@ export type SyncPayload = {
   sentAt: number;
   calls: CallLogEntry[];
   messages: SmsEntry[];
+  driveFolderId?: string;
 };
 
 export type SyncStatus = 'idle' | 'syncing' | 'success' | 'error' | 'offline';
@@ -33,6 +34,7 @@ export type AppConfig = {
   deviceId: string;
   deviceName: string;
   syncUrl: string;
+  googleDriveFolderId: string;
   targetDeviceId: string;
   autoSync: boolean;
   lastSyncAt: number | null;
@@ -45,6 +47,7 @@ export const DEFAULT_APP_CONFIG: AppConfig = {
   deviceId: '',
   deviceName: 'My Android',
   syncUrl: 'http://192.168.1.100:3000',
+  googleDriveFolderId: '',
   targetDeviceId: '',
   autoSync: true,
   lastSyncAt: null,

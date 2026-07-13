@@ -15,6 +15,7 @@ export default function SettingsScreen() {
   const { config, updateConfig } = useAppConfig();
   const { permissions, requestAll } = usePermissions();
   const [syncUrl, setSyncUrl] = useState(config.syncUrl);
+  const [googleDriveFolderId, setGoogleDriveFolderId] = useState(config.googleDriveFolderId);
   const [deviceName, setDeviceName] = useState(config.deviceName);
   const [targetDeviceId, setTargetDeviceId] = useState(config.targetDeviceId);
   const [serverStatus, setServerStatus] = useState<string>('unknown');
@@ -22,6 +23,7 @@ export default function SettingsScreen() {
   const save = async () => {
     await updateConfig({
       syncUrl,
+      googleDriveFolderId,
       deviceName,
       targetDeviceId,
     });
@@ -66,12 +68,20 @@ export default function SettingsScreen() {
             placeholder="Paste sender device ID"
           />
         ) : null}
+        {config.role === 'sender' ? (
+          <LabeledInput
+            label="Google Drive folder ID"
+            value={googleDriveFolderId}
+            onChangeText={setGoogleDriveFolderId}
+            placeholder="Leave empty to use the server default"
+          />
+        ) : null}
         <ThemedText type="small" themeColor="textSecondary">
           Server status: {serverStatus}
         </ThemedText>
         {config.role === 'sender' ? (
           <ThemedText type="small" themeColor="textSecondary">
-            The sync server securely forwards call logs and SMS to its configured Google Drive folder.
+            The sync server securely forwards call logs and SMS to this folder. Share it with the server's Google service account first.
           </ThemedText>
         ) : null}
       </ThemedView>

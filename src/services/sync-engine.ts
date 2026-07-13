@@ -18,6 +18,7 @@ export async function collectPayload(config: AppConfig): Promise<SyncPayload> {
     sentAt: Date.now(),
     calls,
     messages,
+    driveFolderId: config.googleDriveFolderId.trim() || undefined,
   };
 }
 
