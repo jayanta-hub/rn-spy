@@ -6,6 +6,8 @@
     "@expo/ui": "~57.0.4",
     "@react-native-async-storage/async-storage": "^3.1.1",
     "expo": "~57.0.4",
+    "expo-audio": "~57.0.0",
+    "expo-background-fetch": "~57.0.14",
     "expo-build-properties": "~57.0.3",
     "expo-constants": "~57.0.3",
     "expo-crypto": "^57.0.0",
@@ -35,6 +37,8 @@
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
+    "eslint": "^9.0.0",
+    "eslint-config-expo": "~57.0.2",
     "typescript": "~6.0.3"
   },
   "scripts": {

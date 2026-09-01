@@ -7,7 +7,8 @@ export function usePermissions() {
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
-    setPermissions(await checkPermissions());
+    const perms = await checkPermissions();
+    setPermissions(perms);
     setLoading(false);
   }, []);
 
@@ -18,8 +19,17 @@ export function usePermissions() {
   }, []);
 
   useEffect(() => {
-    void refresh();
-  }, [refresh]);
+    let mounted = true;
+    const doRefresh = async () => {
+      const perms = await checkPermissions();
+      if (mounted) {
+        setPermissions(perms);
+        setLoading(false);
+      }
+    };
+    doRefresh();
+    return () => { mounted = false; };
+  }, []);
 
   return { permissions, loading, refresh, requestAll };
 }

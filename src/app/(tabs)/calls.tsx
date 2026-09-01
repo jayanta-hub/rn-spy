@@ -1,12 +1,12 @@
-import { useCallback, useEffect, useState } from 'react';
 import {
+  RecordingPresets,
   requestRecordingPermissionsAsync,
   setAudioModeAsync,
   useAudioPlayer,
   useAudioRecorder,
   useAudioRecorderState,
-  RecordingPresets,
 } from 'expo-audio';
+import { useCallback, useEffect, useState } from 'react';
 import { Alert, Platform, StyleSheet } from 'react-native';
 
 import { PrimaryButton } from '@/components/primary-button';
@@ -37,7 +37,10 @@ export default function CallsScreen() {
   }, [config.role]);
 
   useEffect(() => {
-    void load();
+    const doLoad = async () => {
+      await load();
+    };
+    doLoad();
   }, [load]);
 
   const startRecording = async () => {

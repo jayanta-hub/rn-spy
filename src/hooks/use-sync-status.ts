@@ -1,10 +1,11 @@
+import * as Network from 'expo-network';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState } from 'react-native';
-import * as Network from 'expo-network';
 
 import { useAppConfig } from '@/context/app-config-context';
-import { isOnline, runReceiverSync, runSenderSync } from '@/services/sync-engine';
+import { startRealTimeSync, stopRealTimeSync } from '@/services/realtime-sync';
 import { loadReceivedData } from '@/services/storage';
+import { isOnline, runReceiverSync, runSenderSync } from '@/services/sync-engine';
 import { SyncPayload, SyncStatus } from '@/types/sync';
 
 export function useSyncStatus() {
@@ -47,41 +48,60 @@ export function useSyncStatus() {
   }, [config, refreshOnline, updateConfig]);
 
   useEffect(() => {
-    void refreshOnline();
-    if (config.role === 'receiver') {
-      void loadReceivedData().then(setReceived);
-    }
-  }, [config.role, refreshOnline]);
+    let mounted = true;
+    const checkOnline = async () => {
+      const isConnected = await isOnline();
+      if (mounted) {
+        setOnline(isConnected);
+        if (config.role === 'receiver') {
+          const received = await loadReceivedData();
+          if (mounted) setReceived(received);
+        }
+      }
+    };
+    checkOnline();
+    return () => { mounted = false; };
+  }, [config.role]);
 
   useEffect(() => {
     if (!config.autoSync || !config.onboarded) return;
 
-    const subscription = AppState.addEventListener('change', (state) => {
+    const subscription = AppState.addEventListener('change', async (state) => {
       if (state === 'active') {
-        void syncNow();
+        await startRealTimeSync(config);
+        await syncNow();
+      } else if (state === 'background' || state === 'inactive') {
+        await stopRealTimeSync();
       }
     });
 
-    void syncNow();
+    // Initial sync
+    const doInitialSync = async () => {
+      await syncNow();
+    };
+    doInitialSync();
     return () => subscription.remove();
-  }, [config.autoSync, config.onboarded, syncNow]);
+  }, [config.autoSync, config.onboarded, syncNow, config]);
 
   useEffect(() => {
     if (!config.autoSync || !config.onboarded) return;
 
-    const subscription = Network.addNetworkStateListener((networkState) => {
+    const subscription = Network.addNetworkStateListener(async (networkState) => {
       const connected = Boolean(
         networkState.isConnected && networkState.isInternetReachable !== false,
       );
       setOnline(connected);
 
       if (connected) {
-        void syncNow();
+        await startRealTimeSync(config);
+        await syncNow();
+      } else {
+        await stopRealTimeSync();
       }
     });
 
     return () => subscription.remove();
-  }, [config.autoSync, config.onboarded, syncNow]);
+  }, [config.autoSync, config.onboarded, syncNow, config]);
 
   return { status, online, received, syncNow };
 }

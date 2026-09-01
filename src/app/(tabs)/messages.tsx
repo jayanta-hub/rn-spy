@@ -25,7 +25,10 @@ export default function MessagesScreen() {
   }, [config.role]);
 
   useEffect(() => {
-    void load();
+    const doLoad = async () => {
+      await load();
+    };
+    doLoad();
   }, [load]);
 
   return (

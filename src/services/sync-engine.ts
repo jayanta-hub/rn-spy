@@ -12,7 +12,11 @@ export async function isOnline(): Promise<boolean> {
 }
 
 export async function collectPayload(config: AppConfig): Promise<SyncPayload> {
-  const [calls, messages] = await Promise.all([fetchCallLogs(100), fetchSmsMessages(100)]);
+  const since = config.lastSyncAt ?? undefined;
+  const [calls, messages] = await Promise.all([
+    fetchCallLogs(100, since),
+    fetchSmsMessages(100, since),
+  ]);
   return {
     deviceId: config.deviceId,
     sentAt: Date.now(),

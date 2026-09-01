@@ -81,7 +81,7 @@ export default function SettingsScreen() {
         </ThemedText>
         {config.role === 'sender' ? (
           <ThemedText type="small" themeColor="textSecondary">
-            The sync server securely forwards call logs and SMS to this folder. Share it with the server's Google service account first.
+            The sync server securely forwards call logs and SMS to this folder. Share it with the server&apos;s Google service account first.
           </ThemedText>
         ) : null}
       </ThemedView>
